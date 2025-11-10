@@ -1,0 +1,42 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Expo / React Native artifacts
+.expo/
+.expo-shared/
+web-build/
+dist/
+build/
+coverage/
+miniapp/.next/
+miniapp/out/
+miniapp/.turbo/
+
+# Native platform outputs
+ios/build/
+ios/DerivedData/
+android/app/build/
+android/.gradle/
+android/.idea/
+android/local.properties
+*.iml
+
+# Environment and secrets
+.env
+.env.*
+
+# Editor tooling
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+node_modules

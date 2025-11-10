@@ -1,0 +1,41 @@
+{
+  "name": "quadrant-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@expo/metro-config": "^54.0.6",
+    "@expo/vector-icons": "^15.0.2",
+    "@tonconnect/sdk": "^3.3.1",
+    "eventemitter3": "^5.0.1",
+    "expo": "~54.0.13",
+    "expo-auth-session": "~7.0.8",
+    "expo-clipboard": "~8.0.7",
+    "expo-constants": "~18.0.9",
+    "expo-crypto": "^15.0.7",
+    "expo-dev-client": "~6.0.15",
+    "expo-file-system": "^19.0.17",
+    "expo-secure-store": "~15.0.7",
+    "expo-status-bar": "~3.0.8",
+    "expo-web-browser": "~15.0.8",
+    "node-libs-expo": "^0.0.3",
+    "react": "19.1.0",
+    "react-native": "0.81.4",
+    "react-native-svg": "^15.2.0",
+    "ton-core": "^0.53.0",
+    "ton-crypto": "^3.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@types/react": "~19.1.10",
+    "@types/react-native": "^0.73.0",
+    "babel-preset-expo": "~54.0.4",
+    "typescript": "^5.4.0"
+  }
+}

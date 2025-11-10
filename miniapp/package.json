@@ -1,0 +1,31 @@
+{
+  "name": "quadrant-miniapp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "dependencies": {
+    "next": "14.2.11",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/react": "15.0.7",
+    "@testing-library/user-event": "14.5.1",
+    "@types/node": "20.14.10",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.2",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.11",
+    "jsdom": "^27.0.1",
+    "lodash": "^4.17.21",
+    "typescript": "5.5.4",
+    "vitest": "1.6.0"
+  }
+}

@@ -1,0 +1,1 @@
+"""Quadrant backend application package."""

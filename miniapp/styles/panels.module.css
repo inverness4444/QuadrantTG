@@ -1,0 +1,204 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.card {
+  background: rgba(15, 23, 42, 0.75);
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  padding: 1.5rem;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+}
+
+.card h2,
+.card h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.card p {
+  margin: 0;
+  line-height: 1.5;
+  color: rgba(226, 232, 240, 0.85);
+}
+
+[data-variant="error"] {
+  border-color: rgba(248, 113, 113, 0.45);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(15, 23, 42, 0.8));
+}
+
+.primaryButton {
+  margin-top: 1rem;
+  padding: 0.75rem 1.35rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  color: #0f172a;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primaryButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
+}
+
+.primaryButton:focus-visible {
+  outline: 2px solid rgba(148, 163, 184, 0.6);
+  outline-offset: 3px;
+}
+
+.cardTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.cardBody {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.pillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.pill {
+  background: rgba(148, 163, 184, 0.15);
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  color: rgba(226, 232, 240, 0.85);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.headerTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.headerSubtitle {
+  color: rgba(148, 163, 184, 0.85);
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tile {
+  border-radius: 16px;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 150px;
+}
+
+.tileTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.tileMeta {
+  margin: 0;
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 0.9rem;
+}
+
+.tileTag {
+  align-self: flex-start;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(56, 189, 248, 0.2);
+  color: rgba(186, 230, 253, 1);
+  font-size: 0.75rem;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(34, 197, 94, 0.2);
+  color: rgba(190, 242, 100, 1);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.heroTitle {
+  font-size: 2rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.heroHighlight {
+  color: rgba(129, 140, 248, 1);
+}
+
+.heroBody {
+  color: rgba(203, 213, 225, 0.85);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.heroMetrics {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.metricValue {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.metricLabel {
+  font-size: 0.85rem;
+  color: rgba(148, 163, 184, 0.85);
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 2rem 1.1rem 3rem;
+  }
+  .heroTitle {
+    font-size: 1.6rem;
+  }
+}
