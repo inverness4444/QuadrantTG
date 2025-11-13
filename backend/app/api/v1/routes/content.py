@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db_session, require_admin_user
+from app.core.config import settings
+from app.core.rate_limiter import rate_limit_dependency, user_identifier
 from app.schemas.content import (
     BookCategoryCreate,
     BookCategoryPublic,
@@ -94,8 +96,17 @@ async def list_book_tests(
     return await service.list_book_tests()
 
 
+admin_rate_limit = rate_limit_dependency(
+    scope="admin",
+    limit=settings.admin_rate_limit_per_minute,
+    window_seconds=60,
+    identifier=user_identifier,
+)
+
 admin_router = APIRouter(
-    prefix="/admin", tags=["content-admin"], dependencies=[Depends(require_admin_user)]
+    prefix="/admin",
+    tags=["content-admin"],
+    dependencies=[Depends(require_admin_user), Depends(admin_rate_limit)],
 )
 
 

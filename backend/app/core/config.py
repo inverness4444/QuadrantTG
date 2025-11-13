@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 30
+    global_rate_limit_window_seconds: int = Field(default=10, env="GLOBAL_RATE_LIMIT_WINDOW_SECONDS")
+    global_rate_limit_max_requests: int = Field(default=600, env="GLOBAL_RATE_LIMIT_MAX_REQUESTS")
+    auth_rate_limit_per_minute: int = Field(default=20, env="AUTH_RATE_LIMIT_PER_MINUTE")
+    admin_rate_limit_per_minute: int = Field(default=60, env="ADMIN_RATE_LIMIT_PER_MINUTE")
+    usage_rate_limit_per_minute: int = Field(default=120, env="USAGE_RATE_LIMIT_PER_MINUTE")
+    request_body_max_bytes: int = Field(default=262144, env="REQUEST_BODY_MAX_BYTES")
 
     telegram_bot_token: str = Field(default="dummy", env="TELEGRAM_BOT_TOKEN")
     telegram_bot_domain: HttpUrl | None = Field(default=None, env="TELEGRAM_BOT_DOMAIN")
@@ -32,10 +38,20 @@ class Settings(BaseSettings):
     allowed_origins: tuple[str, ...] = Field(
         default=("http://localhost:3000",), env="ALLOWED_ORIGINS"
     )
+    trusted_proxies: tuple[str, ...] = Field(default=(), env="TRUSTED_PROXIES")
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
     admin_telegram_ids: tuple[int, ...] = Field(
         default=(1350430976, 796891046), env="ADMIN_TELEGRAM_IDS"
     )
+
+    @field_validator("jwt_secret")
+    @classmethod
+    def ensure_secret(cls, value: str) -> str:
+        if value == "change-me":
+            raise ValueError("JWT_SECRET must be set to a secure, non-default value")
+        if len(value) < 16:
+            raise ValueError("JWT_SECRET must be at least 16 characters long")
+        return value
 
     @field_validator("admin_telegram_ids", mode="before")
     @classmethod
@@ -70,6 +86,17 @@ class Settings(BaseSettings):
                     continue
                 origins.append(str(item).strip())
             return tuple([origin for origin in origins if origin])
+        return (str(value).strip(),)
+
+    @field_validator("trusted_proxies", mode="before")
+    @classmethod
+    def parse_trusted_proxies(cls, value: Any) -> tuple[str, ...]:
+        if value in (None, "", ()):
+            return ()
+        if isinstance(value, str):
+            return tuple(part.strip() for part in value.split(",") if part.strip())
+        if isinstance(value, (list, tuple)):
+            return tuple(str(item).strip() for item in value if str(item).strip())
         return (str(value).strip(),)
 
     class Config:

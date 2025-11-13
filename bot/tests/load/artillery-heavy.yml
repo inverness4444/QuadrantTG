@@ -1,0 +1,24 @@
+config:
+  target: "{{ BASE_URL }}"
+  phases:
+    - duration: 120
+      arrivalRate: 20
+    - duration: 60
+      arrivalRate: 100
+  defaults:
+    headers:
+      Content-Type: application/json
+      X-Telegram-Bot-Api-Secret-Token: "{{ WEBHOOK_SECRET }}"
+scenarios:
+  - name: Heavy endpoints burst
+    flow:
+      - post:
+          url: "/telegram/webhook"
+          json:
+            update_id: "{{ $randomInt(1, 9999999) }}"
+            message:
+              text: "/report"
+          capture:
+            - json: "$.status"
+              as: status
+      - think: 1

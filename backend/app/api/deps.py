@@ -1,6 +1,6 @@
 from collections.abc import AsyncIterator
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import SessionLocal
@@ -29,11 +29,12 @@ async def get_telegram_auth_data(
 
 
 async def get_current_user(
+    request: Request,
     telegram: TelegramAuthData = Depends(get_telegram_auth_data),
     db: AsyncSession = Depends(get_db_session),
 ) -> UserPublic:
     service = UserService(db)
-    return await service.get_or_create(
+    user = await service.get_or_create(
         telegram_id=telegram.id,
         username=telegram.username,
         first_name=telegram.first_name,
@@ -41,6 +42,8 @@ async def get_current_user(
         locale=telegram.locale or "en",
         avatar_url=telegram.photo_url,
     )
+    request.state.user_id = user.id
+    return user
 
 
 async def require_admin_user(

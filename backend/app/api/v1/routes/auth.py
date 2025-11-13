@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db_session
+from app.core.config import settings
+from app.core.rate_limiter import rate_limit_dependency
 from app.core.security import create_access_token, create_refresh_token, decode_token
 from app.core.telegram import verify_and_destructure_init_data
 from app.repositories.user import UserRepository
@@ -14,12 +16,19 @@ from app.services.user import UserService
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+auth_rate_limit = rate_limit_dependency(
+    scope="auth",
+    limit=settings.auth_rate_limit_per_minute,
+    window_seconds=60,
+)
+
 
 @router.post(
     "/telegram/miniapp",
     response_model=TokenPair,
     status_code=status.HTTP_200_OK,
     summary="Authenticate Telegram Mini App request",
+    dependencies=[Depends(auth_rate_limit)],
 )
 async def authenticate_telegram_miniapp(
     payload: TelegramMiniAppAuthRequest,
@@ -56,6 +65,7 @@ async def authenticate_telegram_miniapp(
     response_model=TokenPair,
     status_code=status.HTTP_200_OK,
     summary="Refresh access token for Mini App",
+    dependencies=[Depends(auth_rate_limit)],
 )
 async def refresh_tokens(
     payload: RefreshRequest,
