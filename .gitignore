@@ -1,6 +1,13 @@
 # Node dependencies
 node_modules/
 npm-debug.log*
+*.log
+backend.log
+logs/
+
+# Misc
+xuy.txt
+npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*

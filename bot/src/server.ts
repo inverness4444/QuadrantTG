@@ -4,6 +4,7 @@ import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
 import RedisStore, { type RedisReply, type SendCommandFn } from "rate-limit-redis";
 import { webhookCallback } from "grammy";
+import pkg from "../package.json" assert { type: "json" };
 import { bot } from "./bot.js";
 import { env } from "./env.js";
 import { redis } from "./redis.js";
@@ -11,7 +12,8 @@ import { logger } from "./logger.js";
 import { configureTrustProxy, getClientIp } from "./network.js";
 import { anonymizeIp } from "./logging/anonymize.js";
 
-const app = express();
+export const app = express();
+const appVersion = pkg.version ?? "0.0.0";
 
 configureTrustProxy(app);
 
@@ -23,10 +25,14 @@ const redisSendCommand: SendCommandFn = (...args) => {
   return redis.call(command, ...rest) as Promise<RedisReply>;
 };
 
+const isTestEnv = process.env.NODE_ENV === "test" || process.env.VITEST === "true";
+const shouldUseRedisStore = !isTestEnv;
 const createRedisStore = () =>
-  new RedisStore({
-    sendCommand: redisSendCommand
-  });
+  shouldUseRedisStore
+    ? new RedisStore({
+        sendCommand: redisSendCommand
+      })
+    : undefined;
 
 const globalLimiter = rateLimit({
   windowMs: env.globalRateLimitWindowMs,
@@ -49,6 +55,18 @@ const ipLimiter = rateLimit({
   keyGenerator: (req) => getClientIp(req),
   handler: (_req, res) => {
     res.status(429).json({ ok: false, description: "too_many_requests" });
+  },
+  store: createRedisStore()
+});
+
+const webhookIpLimiter = rateLimit({
+  windowMs: 60_000,
+  max: env.webhookIpLimitPerMinute,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => getClientIp(req),
+  handler: (_req, res) => {
+    res.status(429).json({ ok: false, description: "too many requests" });
   },
   store: createRedisStore()
 });
@@ -76,6 +94,15 @@ const webhookSlowdown = slowDown({
 
 app.use(express.json({ limit: "256kb" }));
 app.use((req, res, next) => {
+  res.setTimeout(env.requestTimeoutMs, () => {
+    if (!res.headersSent) {
+      logger.warn({ event: "http_timeout", path: req.path });
+      res.status(503).json({ ok: false, description: "request_timeout" });
+    }
+  });
+  next();
+});
+app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
     const duration = Date.now() - start;
@@ -98,7 +125,12 @@ app.use(globalLimiter);
 app.use(ipLimiter);
 
 app.get("/healthz", (_req, res) => {
-  res.status(200).json({ status: "ok" });
+  res.status(200).json({
+    status: "ok",
+    version: appVersion,
+    uptime: Math.round(process.uptime()),
+    env: process.env.NODE_ENV ?? "development"
+  });
 });
 
 const botWebhook = webhookCallback(bot, "express");
@@ -115,9 +147,16 @@ const verifyWebhookSecret = (req: Request, res: Response, next: NextFunction) =>
   return next();
 };
 
-app.post("/telegram/webhook", webhookLimiter, webhookSlowdown, verifyWebhookSecret, (req: Request, res: Response, next: NextFunction) => {
-  return botWebhook(req, res).catch(next);
-});
+app.post(
+  "/telegram/webhook",
+  webhookIpLimiter,
+  webhookLimiter,
+  webhookSlowdown,
+  verifyWebhookSecret,
+  (req: Request, res: Response, next: NextFunction) => {
+    return botWebhook(req, res).catch(next);
+  }
+);
 
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   logger.error(
@@ -131,6 +170,11 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ ok: false });
 });
 
-app.listen(env.port, () => {
-  logger.info({ event: "service_startup", port: env.port }, "bot_webhook_ready");
-});
+export const startServer = () =>
+  app.listen(env.port, () => {
+    logger.info({ event: "service_startup", port: env.port }, "bot_webhook_ready");
+  });
+
+if (process.env.NODE_ENV !== "test") {
+  startServer();
+}

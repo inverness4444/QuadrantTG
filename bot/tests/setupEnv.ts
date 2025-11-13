@@ -1,3 +1,4 @@
+process.env.NODE_ENV = "test";
 process.env.BOT_TOKEN ??= "test-token";
 process.env.WEBHOOK_SECRET ??= "secret";
 process.env.BACKEND_API_BASE_URL ??= "https://backend.test";

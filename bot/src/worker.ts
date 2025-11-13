@@ -4,6 +4,8 @@ import { Worker } from "bullmq";
 import { bot } from "./bot.js";
 import { callBackendJson } from "./externalClient.js";
 import { queueConnection, heavyOpsQueue, type ReportJobData } from "./queue.js";
+import { logger } from "./logger.js";
+import { anonymizeId } from "./logging/anonymize.js";
 
 const queueName = heavyOpsQueue.name;
 
@@ -28,16 +30,20 @@ const worker = new Worker<ReportJobData>(
 );
 
 worker.on("completed", (job) => {
-  console.info("heavy_job_completed", { jobId: job.id });
+  logger.info({ event: "heavy_job_completed", jobId: job.id });
 });
 
 worker.on("failed", async (job, err) => {
-  console.error("heavy_job_failed", { jobId: job?.id, error: err.message });
+  logger.error({ event: "heavy_job_failed", jobId: job?.id, error: err.message });
   if (job?.data?.chatId) {
     try {
       await bot.api.sendMessage(job.data.chatId, "Не удалось собрать отчёт. Попробуйте чуть позже.");
     } catch (notifyError) {
-      console.error("heavy_job_failure_notification_error", notifyError);
+      logger.error({
+        event: "heavy_job_failure_notification_error",
+        chat: anonymizeId(job.data.chatId),
+        error: notifyError instanceof Error ? notifyError.message : String(notifyError)
+      });
     }
   }
 });

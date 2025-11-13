@@ -16,7 +16,7 @@ const createLogger = () =>
       censor: "[REDACTED]"
     },
     base: {
-      service: "quadrant-bot",
+      service: "quadrant-tg-bot",
       env: process.env.NODE_ENV ?? "development"
     },
     transport:
